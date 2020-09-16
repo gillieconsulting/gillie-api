@@ -49,7 +49,7 @@ export declare class GillieApi {
      * @param request
      */
     execute(request: any): Promise<AxiosResponse<any>>;
-    hex(buff: any): any;
+    hex(buff: any): string;
     /**
      * Insert apikey to http parameters. Insert following parameters:
      * apisalt, apihash and apikey.
@@ -59,4 +59,5 @@ export declare class GillieApi {
      * @param params : Url query parameters
      */
     addParams(params: any): any;
+    private addParam;
 }

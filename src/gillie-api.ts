@@ -103,6 +103,7 @@ export class GillieApi {
         }
         // If no privatekey - dont use hashcodes
         if (!this.config.privateKey) {
+            this.addParam(params,"apikey",this.config.publicKey);
             params.apikey = this.config.publicKey;
             return params;
         }
@@ -111,14 +112,23 @@ export class GillieApi {
         if (this.isBrowser) {
             const encoder = new TextEncoder();
             const data = encoder.encode(this.config.privateKey + this.config.publicKey + params.apisalt);
-            params.apihash  = this.hex(window.crypto.subtle.digest('SHA-256', data));
+            this.addParam(params,"apihash",this.hex(window.crypto.subtle.digest('SHA-256', data)));
         } else {
-            params.apihash = createHash('sha256')
+            this.addParam(params,"apihash", createHash('sha256')
             .update(this.config.privateKey + this.config.publicKey + params.apisalt )
-            .digest('hex');
+            .digest('hex'));
         }
-        params.apikey = this.config.publicKey;
+        this.addParam(params,"apikey",this.config.publicKey);
         return params;
     }
+
+    private addParam(params:any,name: string,value:any) {
+        if (params instanceof URLSearchParams) {
+            params.append(name,value);
+        } else {
+            params[name] = value;
+        }
+    
+    } 
 }
 

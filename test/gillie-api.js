@@ -22,7 +22,13 @@ describe('Test gillie', function() {
     nock('http://localhost')
         .persist()
         .get(/api/)
-        .reply(200, []);
+        .reply(200, function(url,body) {
+          console.log("XX",url);
+          expect(url).contain("apikey=");
+          expect(url).contain("apisalt=");
+          expect(url).contain("apihash=");
+
+        });
 
   });
   it ("Create GillieApi instance", async function() {
