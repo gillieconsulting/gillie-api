@@ -10,14 +10,18 @@ describe('Test gillie', function() {
 
   before(async function() {
     nock.cleanAll();
-
+    nock('http://localhost')
+    .persist()
+    .post(/error/,function(res) {
+      return res;
+    })
+    .reply(400, {error: "Some error"});
     nock('http://localhost')
         .persist()
         .post(/api/,function(res) {
-          console.log(res);
           return res;
         })
-        .reply(200, {});
+        .reply(200, { person_id: "99"});
 
     nock('http://localhost')
         .persist()
@@ -29,7 +33,7 @@ describe('Test gillie', function() {
           expect(url).contain("apihash=");
 
         });
-
+   
   });
   it ("Create GillieApi instance", async function() {
       api = new GillieApi({privateKey: "12345", publicKey: "ddddd", host: "http://localhost"});
@@ -42,8 +46,20 @@ describe('Test gillie', function() {
 
   it ("Post", async function() {
     let resp = await api.post("/api/datapoints",{xx: "bodydata"},{start_date: new Date()});
-  //  console.log(resp);
+    console.log(resp);
+    expect(resp.person_id).to.equal("99");
   });
 
+  it ("Check error return", async function() {
+    let error = false;
+    try {
+      let resp = await api.post("/api/error",{xx: "bodydata"},{start_date: new Date()});
+    } catch(err) {
+      expect(err.response.data.error).to.equal("Some error");
+
+      error = true;
+    }
+    expect(error).to.equal(true);
+  });
 });
 

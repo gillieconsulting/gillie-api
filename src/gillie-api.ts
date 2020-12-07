@@ -80,7 +80,7 @@ export class GillieApi {
             'Access-Control-Allow-Origin': '*',
             'X-Requested-With': 'XMLHttpRequest'
         }
-        return await axios(request);
+        return (await axios(request)).data;
     }
 
 
