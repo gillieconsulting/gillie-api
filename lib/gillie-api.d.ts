@@ -18,7 +18,7 @@ export declare class GillieApi {
      *
      * @param config - configuration of the API
      */
-    private isBrowser;
+    isBrowser: boolean;
     constructor(config: GillieConfiguration);
     /**
      * Get data from gillie

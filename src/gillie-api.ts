@@ -7,7 +7,6 @@ export interface GillieConfiguration {
     host: string;       // Gillie host name
 }
 
-import { TextEncoder } from 'text-encoding';
 import { createHash } from 'crypto';
 import axios, { AxiosRequestConfig, AxiosPromise, AxiosResponse } from 'axios';
 
@@ -22,7 +21,7 @@ export class GillieApi {
      * 
      * @param config - configuration of the API
      */
-    private isBrowser = false;
+    public isBrowser = false; // Public just for testing
 
     constructor(private config: GillieConfiguration ) {
         if (!this.config.host) {
