@@ -47,3 +47,4 @@ version.txt
 
 # vscode history
 .history/
+package-lock.json
