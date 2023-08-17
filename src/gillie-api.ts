@@ -73,12 +73,14 @@ export class GillieApi {
     async execute(request:any) {
         request.url = this.config.host + request.url;
         request.params = this.addParams(request.params);
-
+        request.paramsSerializer = {
+            indexes: null // array indexes format (null - no brackets, false (default) - empty brackets, true - brackets with indexes)
+          };
         request.headers = {
             'Content-Type': 'application/json;',
             'Access-Control-Allow-Origin': '*',
             'X-Requested-With': 'XMLHttpRequest'
-        }
+        };
         return (await axios(request)).data;
     }
 

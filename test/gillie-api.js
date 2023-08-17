@@ -31,7 +31,7 @@ describe('Test gillie', function() {
           expect(url).contain("apikey=");
           expect(url).contain("apisalt=");
           expect(url).contain("apihash=");
-
+          return {url: url};
         });
    
   });
@@ -40,8 +40,9 @@ describe('Test gillie', function() {
   });
 
   it ("Get", async function() {
-    let resp = await api.get("/api/datapoints",{start_date: new Date()});
+    let resp = await api.get("/api/datapoints",{start_date: new Date(), measurement: ["yy","xx"]});
   //  console.log(resp);
+    expect(resp.url).to.contain("measurement=yy&measurement=xx");
   });
 
   it ("Post", async function() {
