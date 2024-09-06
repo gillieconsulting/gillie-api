@@ -17,17 +17,22 @@ describe('Test gillie', function() {
     })
     .reply(400, {error: "Some error"});
     nock('http://localhost')
+    .persist()
+    .intercept(/delete/, 'DELETE')
+    .reply(200, { person_id: "99"});
+    nock('http://localhost')
         .persist()
         .post(/api/,function(res) {
           return res;
         })
         .reply(200, { person_id: "99"});
 
+   
+        
     nock('http://localhost')
         .persist()
         .get(/api/)
         .reply(200, function(url,body) {
-          console.log("XX",url);
           expect(url).contain("apikey=");
           expect(url).contain("apisalt=");
           expect(url).contain("apihash=");
@@ -47,6 +52,12 @@ describe('Test gillie', function() {
 
   it ("Post", async function() {
     let resp = await api.post("/api/datapoints",{xx: "bodydata"},{start_date: new Date()});
+    console.log(resp);
+    expect(resp.person_id).to.equal("99");
+  });
+
+  it ("Delete", async function() {
+    let resp = await api.delete("/delete",null,{});
     console.log(resp);
     expect(resp.person_id).to.equal("99");
   });

@@ -23,7 +23,7 @@ export class GillieApi {
      */
     public isBrowser = false; // Public just for testing
 
-    constructor(private config: GillieConfiguration ) {
+    constructor(private config: GillieConfiguration) {
         if (!this.config.host) {
             this.config.host = "https://gillie.io";
         }
@@ -31,7 +31,7 @@ export class GillieApi {
             throw new Error("Configuration must contain at least public key");
         }
 
-        this.isBrowser=(new Function("try {return this===window;}catch(e){ return false;}"))();
+        this.isBrowser = (new Function("try {return this===window;}catch(e){ return false;}"))();
     }
 
     /**
@@ -40,8 +40,8 @@ export class GillieApi {
      * @param url - Url without host - example: "/api/datapoints"
      * @param params - Query parameters
      */
-    async get( url: string , params: any) {
-        return await this.execute({url: url, params: params, method: 'get'});
+    async get(url: string, params: any) {
+        return await this.execute({ url: url, params: params, method: 'get' });
     }
     /**
      * Post data to gillie
@@ -51,8 +51,8 @@ export class GillieApi {
      * @param params 
      */
 
-    async post( url: string ,  data:any,params: any) {
-        return await this.execute({url:  url, params: params, data: data, method: 'post'});
+    async post(url: string, data: any, params: any) {
+        return await this.execute({ url: url, params: params, data: data, method: 'post' });
     }
     /**
      * Call delete method in gillie
@@ -60,8 +60,8 @@ export class GillieApi {
      * @param url 
      * @param params 
      */
-    async delete( url: string ,params: any) {
-        return await this.execute({url: url, params: params,  method: 'delete'});
+    async delete(url: string, params: any) {
+        return await this.execute({ url: url, params: params, method: 'delete' });
     }
 
     /**
@@ -70,24 +70,31 @@ export class GillieApi {
      * @param request 
      */
 
-    async execute(request:any) {
+    async execute(request: any) {
         request.url = this.config.host + request.url;
         request.params = this.addParams(request.params);
         request.paramsSerializer = {
             indexes: null // array indexes format (null - no brackets, false (default) - empty brackets, true - brackets with indexes)
-          };
-        request.headers = {
-            'Content-Type': 'application/json;',
-            'Access-Control-Allow-Origin': '*',
-            'X-Requested-With': 'XMLHttpRequest'
         };
+        if (request.method === "delete") {
+            request.headers = {
+                'Access-Control-Allow-Origin': '*',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+        } else {
+            request.headers = {
+                'Content-Type': 'application/json;',
+                'Access-Control-Allow-Origin': '*',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+        }
         return (await axios(request)).data;
     }
 
 
-    hex (buff:any) {
-        return [].map.call(new Uint8Array(buff), 
-            (b:any) => ('00' + b.toString(16)).slice(-2)).join('');
+    hex(buff: any) {
+        return [].map.call(new Uint8Array(buff),
+            (b: any) => ('00' + b.toString(16)).slice(-2)).join('');
     }
 
     /**
@@ -98,13 +105,13 @@ export class GillieApi {
      * 
      * @param params : Url query parameters
      */
-    public addParams(params:any) {
+    public addParams(params: any) {
         if (!params) {
             params = {};
         }
         // If no privatekey - dont use hashcodes
         if (!this.config.privateKey) {
-            this.addParam(params,"apikey",this.config.publicKey);
+            this.addParam(params, "apikey", this.config.publicKey);
             params.apikey = this.config.publicKey;
             return params;
         }
@@ -113,23 +120,23 @@ export class GillieApi {
         if (this.isBrowser) {
             const encoder = new TextEncoder();
             const data = encoder.encode(this.config.privateKey + this.config.publicKey + params.apisalt);
-            this.addParam(params,"apihash",this.hex(window.crypto.subtle.digest('SHA-256', data)));
+            this.addParam(params, "apihash", this.hex(window.crypto.subtle.digest('SHA-256', data)));
         } else {
-            this.addParam(params,"apihash", createHash('sha256')
-            .update(this.config.privateKey + this.config.publicKey + params.apisalt )
-            .digest('hex'));
+            this.addParam(params, "apihash", createHash('sha256')
+                .update(this.config.privateKey + this.config.publicKey + params.apisalt)
+                .digest('hex'));
         }
-        this.addParam(params,"apikey",this.config.publicKey);
+        this.addParam(params, "apikey", this.config.publicKey);
         return params;
     }
 
-    private addParam(params:any,name: string,value:any) {
+    private addParam(params: any, name: string, value: any) {
         if (params instanceof URLSearchParams) {
-            params.append(name,value);
+            params.append(name, value);
         } else {
             params[name] = value;
         }
-    
-    } 
+
+    }
 }
 
